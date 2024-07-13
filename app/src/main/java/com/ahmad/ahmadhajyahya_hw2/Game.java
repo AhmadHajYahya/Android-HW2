@@ -1,6 +1,7 @@
 package com.ahmad.ahmadhajyahya_hw2;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Handler;
 import android.util.Log;
 import android.view.View;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 
@@ -62,14 +64,14 @@ public class Game extends AppCompatActivity {
         obsRunnable = new Runnable() {
             @Override
             public void run() {
-                randomObstacle(0);
+                randomObs();
                 obsHandler.postDelayed(this, 4000);
             }
         };
         obs1Runnable = new Runnable() {
             @Override
             public void run() {
-                randomObstacle(1);
+                randomObs1();
                 obs1Handler.postDelayed(this, 3800);
             }
         };
@@ -79,14 +81,15 @@ public class Game extends AppCompatActivity {
                 moveObs();
                 moveObs1();
                 moveCoin();
-                moveViewsHandler.postDelayed(this, 800);
+                checkCollision();
+                moveViewsHandler.postDelayed(this, 900);
             }
         };
         coinRunnable = new Runnable() {
             @Override
             public void run() {
                 randomCoin();
-                coinHandler.postDelayed(this, 3200);
+                coinHandler.postDelayed(this, 4200);
             }
         };
 
@@ -100,7 +103,10 @@ public class Game extends AppCompatActivity {
         obs1Handler.removeCallbacks(obs1Runnable);
         moveViewsHandler.removeCallbacks(moveViewsRunnable);
         coinHandler.removeCallbacks(coinRunnable);
+        finish();
+
     }
+
     public void moveRight() {
         if (currentCarLane < gameManager.getCOLS()-1) {
             currentCarLane++;
@@ -116,7 +122,6 @@ public class Game extends AppCompatActivity {
     }
 
     private void moveCar() {
-        checkCollision();
         switch (currentCarLane) {
             case 0:
                 removeView(gameManager.getROWS()-1, 1, obstacles_IMG_car);
@@ -154,6 +159,7 @@ public class Game extends AppCompatActivity {
                 addView(gameManager.getROWS()-1, 4, obstacles_IMG_car);
                 break;
         }
+        checkCollision();
     }
 
     private void moveObs(){
@@ -164,7 +170,7 @@ public class Game extends AppCompatActivity {
             obsCurrentRow = 0;
         }
         addView(obsCurrentRow, obsCurrentCol, obstacle);
-        checkCollision();
+
     }
 
     private void moveObs1(){
@@ -175,7 +181,7 @@ public class Game extends AppCompatActivity {
             obs1CurrentRow = 0;
         }
         addView(obs1CurrentRow, obs1CurrentCol, obstacle1);
-        checkCollision();
+
     }
 
     private void moveCoin() {
@@ -187,7 +193,7 @@ public class Game extends AppCompatActivity {
             coinCurrentRow = 0;
         }
         addView(coinCurrentRow, coinCurrentCol, coin);
-        checkCollision();
+
     }
 
     private void checkCollision() {
@@ -206,34 +212,33 @@ public class Game extends AppCompatActivity {
                 stopGame();
                 // Show game over message
                 gameManager.lose();
-                finish();
+                gameManager.saveData();
             }
         }
     }
 
-    private void randomObstacle(int obsNum) {
-        if (obsNum == 0) {
-            removeView(obsCurrentRow, obsCurrentCol, obstacle);
-            int row = 0;
-            int col = random.nextInt(gameManager.getCOLS());
+    private void randomObs(){
+        removeView(obsCurrentRow, obsCurrentCol, obstacle);
+        int row = 0;
+        int col = random.nextInt(gameManager.getCOLS());
 
-            obsCurrentRow = row;
-            obsCurrentCol = col;
-            addView(obsCurrentRow, obsCurrentCol, obstacle);
-        } else {
-            removeView(obs1CurrentRow, obs1CurrentCol, obstacle1);
-            int row = 0;
-            int col1 = random.nextInt(gameManager.getCOLS());
+        obsCurrentRow = row;
+        obsCurrentCol = col;
+        addView(obsCurrentRow, obsCurrentCol, obstacle);
+    }
+    private void randomObs1(){
+        removeView(obs1CurrentRow, obs1CurrentCol, obstacle1);
+        int row = 0;
+        int col = random.nextInt(gameManager.getCOLS());
 
-            // Ensure col1 is different from obsCurrentCol
-            while (col1 == obsCurrentCol) {
-                col1 = random.nextInt(gameManager.getCOLS());
-            }
-
-            obs1CurrentRow = row;
-            obs1CurrentCol = col1;
-            addView(obs1CurrentRow, obs1CurrentCol, obstacle1);
+        // Ensure col1 is different from obsCurrentCol
+        while (col == obsCurrentCol) {
+            col = random.nextInt(gameManager.getCOLS());
         }
+
+        obs1CurrentRow = row;
+        obs1CurrentCol = col;
+        addView(obs1CurrentRow, obs1CurrentCol, obstacle1);
     }
 
     private void randomCoin() {
@@ -259,7 +264,10 @@ public class Game extends AppCompatActivity {
 
         for (int i = 0; i < SZ - gameManager.getLives(); i++) {
             obstacles_IMG_hearts[SZ - i - 1].setVisibility(View.INVISIBLE);
+
         }
+
+
     }
 
     private void removeView(int row, int col, AppCompatImageView view) {
@@ -273,5 +281,13 @@ public class Game extends AppCompatActivity {
 
     private void updateScoreUI(){
         score.setText("" + gameManager.getCoins());
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == GameManager.REQUEST_LOCATION_PERMISSION) {
+            gameManager.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        }
     }
 }

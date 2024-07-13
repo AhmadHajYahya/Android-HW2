@@ -29,22 +29,29 @@ public class MenuActivity extends AppCompatActivity {
 
     private void initScreens(){
         sensorMode.setOnClickListener((view)->{
-            // Create an Intent to start MenuActivity
+            // Create an Intent to start MainActivity
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString("KEY_MESSAGE", "sensor_mode");
             intent.putExtras(bundle);
-            // Start MenuActivity
+            // Start MainActivity
             startActivity(intent);
         });
 
         buttonMode.setOnClickListener((view)->{
-            // Create an Intent to start MenuActivity
+            // Create an Intent to start MainActivity
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             Bundle bundle = new Bundle();
             bundle.putString("KEY_MESSAGE", "button_mode");
             intent.putExtras(bundle);
-            // Start MenuActivity
+            // Start MainActivity
+            startActivity(intent);
+        });
+
+        recordsButton.setOnClickListener((view)-> {
+            // Create an Intent to start RecordsActivity
+            Intent intent = new Intent(getApplicationContext(), RecordsActivity.class);
+            // Start RecordsActivity
             startActivity(intent);
         });
     }

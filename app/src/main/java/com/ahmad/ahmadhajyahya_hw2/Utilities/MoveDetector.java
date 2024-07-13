@@ -46,13 +46,13 @@ public class MoveDetector {
     private void calculateMove(float x) {
         if (System.currentTimeMillis() - timestamp > 500){
             timestamp = System.currentTimeMillis();
-            if (x > 1.0 ){
+            if (x > 0.5 ){
                 direction = "right";
                 if (moveCallback != null){
                     moveCallback.moveX();
                 }
             }
-            if (x < -1.0){
+            if (x < -0.5){
                 direction = "left";
                 if (moveCallback != null){
                     moveCallback.moveX();
